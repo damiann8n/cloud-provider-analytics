@@ -44,6 +44,7 @@ Carpetas previstas para próximas entregas: `src/` (jobs), `tests/`, `config/`, 
 | [03 · Arquitectura v1](docs/03_arquitectura.md) | Diagrama, componentes y patrón Lambda |
 | [04 · Diseño del Data Lake](docs/04_data_lake.md) | Zonas, tablas, particiones, nombres, retención y reglas de promoción |
 | [05 · Flujos de datos](docs/05_flujos.md) | Flujo batch y flujo streaming paso a paso, con herramientas |
+| [06 · Lógica MapReduce](docs/06_mapreduce.md) | Map, shuffle y reduce aplicados al mart principal, con ejemplo a mano |
 | [Registro de decisiones](DECISIONS.md) | Decisiones técnicas (D-01, D-02, …) con su justificación |
 | [00 · Exploración de datos](notebooks/00_exploracion_datos.ipynb) | Evidencia de lectura y perfil con PySpark |
 
