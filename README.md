@@ -46,6 +46,7 @@ Carpetas previstas para próximas entregas: `src/` (jobs), `tests/`, `config/`, 
 | [05 · Flujos de datos](docs/05_flujos.md) | Flujo batch y flujo streaming paso a paso, con herramientas |
 | [06 · Lógica MapReduce](docs/06_mapreduce.md) | Map, shuffle y reduce aplicados al mart principal, con ejemplo a mano |
 | [07 · Matriz requisito–componente](docs/07_matriz_requisitos.md) | Trazabilidad entre requisitos, consultas, objetivos, 5V y componentes |
+| [08 · Supuestos, riesgos y plan](docs/08_supuestos_riesgos_plan.md) | Supuestos, riesgos, decisiones abiertas, esfuerzo, roles y recursos |
 | [Registro de decisiones](DECISIONS.md) | Decisiones técnicas (D-01, D-02, …) con su justificación |
 | [00 · Exploración de datos](notebooks/00_exploracion_datos.ipynb) | Evidencia de lectura y perfil con PySpark |
 
