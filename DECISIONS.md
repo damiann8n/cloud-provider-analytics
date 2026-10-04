@@ -54,3 +54,17 @@ Los dos caminos se juntan en la capa Gold.
 - **Híbrido:** no encontré un motivo concreto que justifique mezclar los patrones.
 
 **Evolución futura:** si el volumen creciera mucho, el paso siguiente sería una arquitectura **Lakehouse**, con Delta Lake o Iceberg sobre Parquet. Agrega transacciones, historial de versiones y actualizaciones sin duplicar, y permite procesar batch y streaming como si fueran un solo camino.
+
+---
+
+## D-03 · Particionar solo por fecha
+
+**Fecha:** 04/10/2026 · **Estado:** decidida
+
+**Qué decidí:** particionar las tablas grandes solo por fecha (`event_date`, `usage_date`, `date` o `month`, según la tabla). Los maestros chicos no se particionan.
+
+**Por qué:** casi todas las consultas y subconsultas se hacen por fecha, así que esta partición debería ser la más eficiente. Las 5 consultas obligatorias filtran por fecha (rango, últimos 14 días, últimos 30 días, mes y día), y así Spark puede leer solo las carpetas necesarias (*partition pruning*).
+
+**Alternativa que descarté:** particionar también por servicio. Con el volumen actual (43.200 eventos) quedarían 360 carpetas de unas 120 filas cada una: demasiados archivos chicos, que hacen más lento a Spark. La revisaría si el volumen creciera.
+
+**Detalle:** ver [docs/04_data_lake.md](docs/04_data_lake.md).
