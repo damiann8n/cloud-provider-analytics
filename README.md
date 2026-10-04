@@ -13,13 +13,34 @@ Pipeline de datos con **PySpark** para el área de datos de un proveedor de nube
 | Segunda entrega · Implementación técnica | 18/11/2026 19:00 h | ⚪ Pendiente |
 | Evaluación final · MVP y defensa | 09/12/2026 19:00 h | ⚪ Pendiente |
 
+## Primera entrega · Diseño y fundación (07/10/2026)
+
+Esta tabla sigue el checklist de la consigna (sección 9.1) y dice dónde encontrar cada punto.
+
+| Ítem de la consigna | Dónde está |
+|---|---|
+| Interpretación del caso y objetivos medibles | [01 · Problema y objetivos](docs/01_problema_y_objetivos.md) |
+| Análisis 5V | [02 · 5V e inventario](docs/02_5v_e_inventario_fuentes.md) (2.1) y [07 · Matriz](docs/07_matriz_requisitos.md) (7.3) |
+| Inventario y perfil de fuentes | [02 · 5V e inventario](docs/02_5v_e_inventario_fuentes.md) (2.2 y 2.3) |
+| Arquitectura v1 y patrón justificado | [03 · Arquitectura](docs/03_arquitectura.md) y [D-02](DECISIONS.md) |
+| Diseño Landing / Bronze / Silver / Gold | [04 · Data Lake](docs/04_data_lake.md) |
+| Flujos batch y streaming | [05 · Flujos](docs/05_flujos.md) |
+| Lógica MapReduce o equivalente | [06 · MapReduce](docs/06_mapreduce.md) |
+| Matriz requisito–componente | [07 · Matriz](docs/07_matriz_requisitos.md) |
+| Supuestos, riesgos, mitigaciones y estimación de esfuerzo | [08 · Supuestos, riesgos y plan](docs/08_supuestos_riesgos_plan.md) |
+| Evidencia mínima de lectura y exploración de datos | [00 · Exploración](notebooks/00_exploracion_datos.ipynb) (ejecutado en Colab, con salidas) |
+| Registro de decisiones | [DECISIONS.md](DECISIONS.md) (D-01 a D-04) |
+| Repositorio accesible y versionado | Este repositorio |
+
+**Orden de lectura sugerido:** 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08, y el notebook como evidencia.
+
 ## Quickstart (Google Colab)
 
 1. Abrir el notebook de exploración en Colab:
    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/damiann8n/cloud-provider-analytics/blob/main/notebooks/00_exploracion_datos.ipynb)
 2. **Entorno de ejecución → Ejecutar todas.**
 
-El notebook instala PySpark, clona este repositorio, descomprime el dataset de `data/` en `data/raw/` y ejecuta el perfil de las fuentes. No requiere credenciales ni pasos manuales.
+El notebook instala PySpark, clona este repositorio, descomprime el dataset de `data/` en `/content/datos` y ejecuta el perfil de las fuentes. No requiere credenciales ni pasos manuales.
 
 **Requisitos:** cuenta de Google (Colab) · Python 3 · PySpark (se instala automáticamente) · Java (incluido en Colab).
 
