@@ -68,3 +68,22 @@ Los dos caminos se juntan en la capa Gold.
 **Alternativa que descarté:** particionar también por servicio. Con el volumen actual (43.200 eventos) quedarían 360 carpetas de unas 120 filas cada una: demasiados archivos chicos, que hacen más lento a Spark. La revisaría si el volumen creciera.
 
 **Detalle:** ver [docs/04_data_lake.md](docs/04_data_lake.md).
+
+---
+
+## D-04 · Watermark amplio en el streaming
+
+**Fecha:** 04/10/2026 · **Estado:** abierta (se ajusta en el Parcial 2)
+
+**Qué encontré:** cada archivo JSONL trae eventos de los dos meses (julio y agosto) mezclados y desordenados.
+
+**El problema:** el watermark descarta los eventos que llegan con más de cierto atraso. Con un valor típico (por ejemplo, 10 minutos), después del primer archivo Spark descartaría casi todos los eventos de julio por considerarlos tardíos.
+
+**Qué decidí:**
+
+- Usar un **watermark amplio**. El valor exacto lo defino en el Parcial 2, probándolo con los datos reales.
+- No depender del watermark para que Gold quede correcto: en cada micro-lote (`foreachBatch`) recalculo los días que llegaron y reescribo esas particiones.
+
+**Trade-off:** un watermark amplio hace que Spark guarde en memoria más estado para deduplicar. Con el volumen de este dataset no es un problema, pero con muchos más datos habría que revisarlo.
+
+**Detalle:** ver [docs/05_flujos.md](docs/05_flujos.md).

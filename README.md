@@ -43,6 +43,7 @@ Carpetas previstas para próximas entregas: `src/` (jobs), `tests/`, `config/`, 
 | [02 · 5V e inventario de fuentes](docs/02_5v_e_inventario_fuentes.md) | Justificación Big Data, inventario, perfil y calidad de datos |
 | [03 · Arquitectura v1](docs/03_arquitectura.md) | Diagrama, componentes y patrón Lambda |
 | [04 · Diseño del Data Lake](docs/04_data_lake.md) | Zonas, tablas, particiones, nombres, retención y reglas de promoción |
+| [05 · Flujos de datos](docs/05_flujos.md) | Flujo batch y flujo streaming paso a paso, con herramientas |
 | [Registro de decisiones](DECISIONS.md) | Decisiones técnicas (D-01, D-02, …) con su justificación |
 | [00 · Exploración de datos](notebooks/00_exploracion_datos.ipynb) | Evidencia de lectura y perfil con PySpark |
 
