@@ -37,7 +37,7 @@ El dataset provisto es una **muestra sintética** (~13 MB, 80 organizaciones, 60
 | `resources` | `tags_json`: 83 nulos; JSON embebido en CSV. | Parseo a `array<string>`; nulo → array vacío. |
 | `support_tickets` | `resolved_at`: 240 nulos (tickets abiertos); `csat`: 254 nulos y valores fuera de escala (0, 6, 7 sobre escala 1–5). | Abierto = `resolved_at` nulo; CSAT fuera de 1–5 → nulo + flag. |
 | `nps_surveys` | `nps_score`: 19 nulos; `comment`: 10 nulos; solo 60 de 80 orgs con encuesta. | Nulos se conservan; join left con orgs. |
-| `billing_monthly` | `subtotal`: 13 negativos (ajustes/notas de crédito); `credits`: 137 nulos; 3 monedas (USD, ARS, EUR); **`exchange_rate_to_usd` ≠ 1 en las 160 facturas USD** (0,85–1,12). | `credits` nulo → 0; normalizar a USD con FX de la fila; regla de calidad: si `currency = USD` y FX ≠ 1 → **se fuerza FX = 1 y se marca `fx_corrected_flag`** (decisión D-01: contablemente, 1 USD = 1 USD). |
+| `billing_monthly` | `subtotal`: 13 negativos (ajustes/notas de crédito); `credits`: 137 nulos; 3 monedas (USD, ARS, EUR); **`exchange_rate_to_usd` varía ±10 % entre facturas de la misma moneda y el mismo mes** en las tres monedas (USD 0,85–1,12 con promedio ≈ 1,00; EUR promedio ≈ 1,10; ARS promedio ≈ 0,0015): ruido sintético por fila. | `credits` nulo → 0; **D-01:** se usa un FX único por moneda y mes (promedio mensual; USD = 1); el FX original se conserva en `exchange_rate_original` para auditoría. Supuesto a validar con el profesor. |
 | `usage_events` | `value` nulo (877) o string numérico (1.309); `unit` nulo (2.075); 216 `cost_usd_increment` negativos (mín. −154,46); spikes (máx. 317,43); v1 (10.800, 03/07–17/07) sin `carbon_kg`/`genai_tokens`; v2 (32.400, 18/07–31/08); `genai_tokens` en 3.132 eventos; eventos desordenados. | Cast de `value` con fallback a nulo; reglas: `event_id` no nulo/único, `cost >= -0.01` (si no → flag), `unit` no nulo si hay `value`; unificación v1/v2 con columnas nulas; watermark para late data. |
 
 ### Integridad referencial
@@ -54,6 +54,6 @@ Ninguna fuente trae metadatos de ingesta. Se agregan en Bronze: `ingest_ts` y `s
 | Riesgo | Impacto | Mitigación |
 |---|---|---|
 | **Desfase temporal**: facturación desde jun-2025, eventos recién desde 03/07/2025. | No se puede conciliar uso vs facturación de junio. | Documentarlo como supuesto; conciliación solo jul–ago. |
-| FX de USD distinto de 1. | Revenue en USD distorsionado. | Forzar FX = 1 + flag `fx_corrected_flag` (decisión D-01). |
+| Tipo de cambio con ruido por factura (todas las monedas). | Revenue en USD distorsionado. | FX único por moneda y mes, USD = 1, original conservado (decisión D-01). |
 | Escalas de NPS/CSAT inconsistentes. | Métricas de satisfacción sesgadas. | Validación de rango + flag. |
 | Costos negativos y spikes. | Distorsión de costos y anomalías falsas. | Flag de anomalía con método robusto (MAD/percentiles), sin eliminar el dato. |
