@@ -33,7 +33,7 @@ cloud-provider-analytics/
 └── README.md
 ```
 
-Carpetas previstas para próximas entregas: `src/` (jobs), `tests/`, `config/`, `infra/`, `evidence/` y `DECISIONS.md`.
+Carpetas previstas para próximas entregas: `src/` (jobs), `tests/`, `config/`, `infra/` y `evidence/`.
 
 ## Documentación
 
@@ -41,6 +41,8 @@ Carpetas previstas para próximas entregas: `src/` (jobs), `tests/`, `config/`, 
 |---|---|
 | [01 · Problema y objetivos](docs/01_problema_y_objetivos.md) | Problema, usuarios, preguntas de negocio y objetivos medibles |
 | [02 · 5V e inventario de fuentes](docs/02_5v_e_inventario_fuentes.md) | Justificación Big Data, inventario, perfil y calidad de datos |
+| [03 · Arquitectura v1](docs/03_arquitectura.md) | Diagrama, componentes y patrón Lambda |
+| [Registro de decisiones](DECISIONS.md) | Decisiones técnicas (D-01, D-02, …) con su justificación |
 | [00 · Exploración de datos](notebooks/00_exploracion_datos.ipynb) | Evidencia de lectura y perfil con PySpark |
 
 ## Datos
