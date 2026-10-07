@@ -1,4 +1,5 @@
 # Cloud Provider Analytics
+## ARCHIVOS .md REALIZADOS CON AYUDA DE CLAUDE IA (especialmente tablas y enlaces a documentación)
 
 Proyecto integrador de **Minería de Datos II** · ISTEA · 2.º cuatrimestre 2026 · Prof. Diego Mosquera
 Autor: Damián Silva (`damiann8n`) · Trabajo individual
