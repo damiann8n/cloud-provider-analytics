@@ -1,4 +1,5 @@
 # Registro de decisiones
+## ARCHIVOS .md REALIZADOS CON AYUDA DE CLAUDE IA (especialmente tablas y enlaces a documentación)
 
 Acá anoto las decisiones técnicas que voy tomando en el proyecto: qué decidí, por qué y qué alternativas descarté.
 Cada una tiene un número (D-01, D-02, …) para poder citarla desde los otros documentos.
