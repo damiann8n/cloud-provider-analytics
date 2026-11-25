@@ -1,7 +1,7 @@
 # 3. Arquitectura v1
 
 > Proyecto: Cloud Provider Analytics · Minería de Datos II · ISTEA 2C 2026
-> Versión: 1.0 · 04/10/2026 · Patrón elegido: **Lambda** (ver [D-02](../DECISIONS.md))
+> Versión: 1.1 · 24/11/2026 (v1.0 del 04/10/2026; ver 3.5) · Patrón elegido: **Lambda** (ver [D-02](../DECISIONS.md))
 
 ## 3.1 Diagrama general
 
@@ -85,3 +85,38 @@ Son cosas que atraviesan todo el pipeline, no una sola etapa:
 - **Observabilidad:** logs de cada ejecución con conteos (cuántos registros entraron, cuántos pasaron, cuántos fueron a quarantine).
 
 El detalle de cada zona del Data Lake (formatos, particiones, nombres y retención) está en el documento 04.
+
+## 3.5 Actualización Parcial 2: cómo quedó implementado
+
+En la implementación (notebook `01_pipeline.ipynb`) ajusté algunas cosas del diseño v1:
+
+```mermaid
+flowchart LR
+    CSV["7 CSV"] -- "spark.read + esquema" --> BB["Bronze batch<br/>7 tablas"]
+    JSONL["120 JSONL"] -- "Query 1: readStream<br/>watermark 60 días<br/>dedupe event_id<br/>checkpoint" --> BS["Bronze eventos<br/>43.200"]
+    BS -- "Query 2: foreachBatch<br/>recalcula días afectados" --> VAL{"Reglas de<br/>calidad"}
+    VAL -- "no cumple" --> QUA["Quarantine<br/>2.244"]
+    VAL -- "cumple" --> SIL["Silver eventos<br/>+ join organizaciones<br/>40.956"]
+    BB -- "customers_orgs" --> SIL
+    SIL --> GOLD["Gold<br/>org_daily_usage_by_service<br/>top_services_14d"]
+    GOLD -- "astrapy (Data API)<br/>upsert" --> CAS[("AstraDB<br/>default_keyspace")]
+
+    classDef batch fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+    classDef stream fill:#ffedd5,stroke:#c2410c,color:#0f172a
+    classDef serve fill:#dcfce7,stroke:#15803d,color:#0f172a
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#0f172a
+    class CSV,BB batch
+    class JSONL,BS stream
+    class CAS serve
+    class QUA bad
+```
+
+| Cambio respecto de v1 | Por qué |
+|---|---|
+| La calidad se valida **entre Bronze y Silver** (Bronze guarda todo) | El profesor indicó que Bronze no descarta nada |
+| El streaming son **dos queries**: Landing → Bronze y Bronze → Silver/Gold | Cada query tiene su checkpoint; la segunda recalcula días completos (D-05) |
+| La carga a Cassandra es con **astrapy** (Data API) y no con el conector Spark–Cassandra | Es como lo enseñó el profesor para AstraDB desde Colab (D-06) |
+| Uso `default_keyspace` | No tuve permisos para crear otro keyspace en el plan gratuito (D-06) |
+| `repartition` por fecha antes de escribir | Evita los archivos chicos (D-07) |
+
+Lo que todavía no está implementado (marts de Soporte, revenue, GenAI, anomalías y ML) está en el [BACKLOG](../BACKLOG.md).

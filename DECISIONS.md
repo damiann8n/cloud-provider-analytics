@@ -8,7 +8,7 @@ Cada una tiene un número (D-01, D-02, …) para poder citarla desde los otros d
 
 ## D-01 · Tipo de cambio en la facturación
 
-**Fecha:** 04/10/2026 · **Estado:** decidida (a validar con el profesor)
+**Fecha:** 04/10/2026 · **Estado:** decidida (la decisión es mía y la justifico acá)
 
 **Qué encontré:** en `billing_monthly.csv`, el campo `exchange_rate_to_usd` cambia de una factura a otra aunque sean de la misma moneda y el mismo mes. La variación es de ±10 % y aparece en las tres monedas:
 
@@ -74,7 +74,7 @@ Los dos caminos se juntan en la capa Gold.
 
 ## D-04 · Watermark amplio en el streaming
 
-**Fecha:** 04/10/2026 · **Estado:** abierta (se ajusta en el Parcial 2)
+**Fecha:** 04/10/2026 · **Estado:** cerrada en el Parcial 2 (ver D-05)
 
 **Qué encontré:** cada archivo JSONL trae eventos de los dos meses (julio y agosto) mezclados y desordenados.
 
@@ -88,3 +88,80 @@ Los dos caminos se juntan en la capa Gold.
 **Trade-off:** un watermark amplio hace que Spark guarde en memoria más estado para deduplicar. Con el volumen de este dataset no es un problema, pero con muchos más datos habría que revisarlo.
 
 **Detalle:** ver [docs/05_flujos.md](docs/05_flujos.md).
+
+---
+
+## D-05 · Watermark de 60 días y deduplicación por event_id
+
+**Fecha:** 24/11/2026 · **Estado:** decidida (cierra D-04)
+
+**Qué decidí:**
+
+- Watermark de **60 días** sobre `event_ts` (la fecha del evento, no la de carga).
+- Deduplicación con `dropDuplicatesWithinWatermark(["event_id"])`.
+- Lectura de **10 archivos por micro-lote** (`maxFilesPerTrigger = 10`), o sea 12 micro-lotes para los 120 archivos, con `trigger(availableNow=True)`.
+
+**Por qué 60 días:** el dataset va del 03/07 al 31/08/2025 (unos 60 días) y cada archivo trae eventos de los dos meses mezclados. Con un watermark chico, después del primer micro-lote Spark daría por "tardíos" casi todos los eventos de julio y los descartaría. Con 60 días no se pierde ningún evento: entraron los 43.200.
+
+**Late data:** aunque un evento llegue tarde, no rompe Gold. La segunda query (`foreachBatch`) recalcula **completos los días que aparecen en cada micro-lote**, leyendo de Bronze todos los eventos de esos días, y pisa solo esas particiones.
+
+**Trade-off:** un watermark grande obliga a Spark a guardar más estado (los `event_id` vistos). Con este volumen el checkpoint ocupa 3 MB; con mucho más volumen habría que achicarlo.
+
+**Evidencia:** prueba 2 de idempotencia: reenvié un archivo ya procesado con otro nombre; Spark leyó sus 360 filas y las descartó todas como duplicadas.
+
+---
+
+## D-06 · AstraDB: base vector, default_keyspace, Data API y claves de las tablas
+
+**Fecha:** 24/11/2026 · **Estado:** decidida
+
+**Qué decidí:**
+
+- Base **Serverless (vector)**, que trae habilitada la Data API.
+- Uso el keyspace **`default_keyspace`**: al intentar crear `cloud_analytics`, Astra me dijo que no tenía permisos con el plan gratuito.
+- Me conecto desde Colab con **astrapy** (`DataAPIClient` + endpoint + token), como mostró el profesor en clase. El token va en Colab Secrets.
+- Dos tablas **query-first**, una por consulta:
+
+| Tabla | Clave primaria | Consulta que resuelve |
+|---|---|---|
+| `org_daily_usage_by_service` | `((org_id), usage_date, service)` | Costos y requests de una org en un rango de fechas |
+| `top_services_14d` | `((org_id), cost_14d DESC, service)` | Top-N servicios por costo en los últimos 14 días |
+
+**Por qué esas claves:** la partición es `org_id` porque todas las consultas son "de una organización" y así una consulta lee una sola partición (80 orgs, particiones acotadas). En la primera tabla el clustering por `usage_date` permite pedir un rango de fechas; en la segunda, el clustering por `cost_14d DESC` hace que Cassandra ya guarde los servicios ordenados de mayor a menor, así que el top-N es un `LIMIT` sin ordenar nada.
+
+**Sobre el CQL:** esta base no tiene consola CQL en el portal. Dejé el CQL equivalente (CREATE TABLE y SELECT) en [cql/consultas.cql](cql/consultas.cql) y ejecuté las mismas consultas con la Data API (celda 15). El resultado está en [evidence/consultas_astra.txt](evidence/consultas_astra.txt).
+
+**Idempotencia y errores:** `insert_many` en tablas funciona como **upsert** (pisa por clave primaria). Astra a veces devuelve un error temporal justo después de crear una tabla; como la carga es upsert, se puede reintentar sin duplicar.
+
+**Alternativa que dejé para el final:** ejecutar el CQL real con `cassandra-driver` y el *Secure Connect Bundle* (ver BACKLOG).
+
+---
+
+## D-07 · Reglas de calidad, quarantine y control de archivos chicos
+
+**Fecha:** 24/11/2026 · **Estado:** decidida
+
+**Reglas de calidad** (entre Bronze y Silver; Bronze guarda todo, como dijo el profesor):
+
+| Regla | Motivo en quarantine | Registros |
+|---|---|---|
+| La línea no se pudo leer | `registro_corrupto` | 0 |
+| `event_id` no nulo | `event_id_nulo` | 0 |
+| `cost_usd_increment >= -0.01` | `costo_negativo` | 211 |
+| `unit` no nulo cuando hay `value` | `unit_nulo_con_value` | 2.033 |
+
+- Marco en vez de descartar: cada registro guarda el **motivo** de la primera regla que falla.
+- Las validaciones son null-safe (`coalesce(..., False)`), así un null no rompe la comparación.
+- `value` llega a veces como texto: lo convierto con `try_cast`, que devuelve null en lugar de cortar el programa (Spark 4 tiene el modo ANSI activado).
+- Los **spikes** (costos muy altos) no van a quarantine: son válidos. Su detección con MAD queda para el final (BACKLOG).
+
+**Archivos chicos:** en la primera corrida el Data Lake quedó con **12.006 archivos Parquet** y Bronze ocupaba 72 MB (más que los 13 MB de JSONL originales). Pasaba porque cada micro-lote escribía un archivo por cada día × cada partición del shuffle (8). Lo corregí con `repartition("event_date")` antes de cada escritura (1 archivo por día):
+
+| | Antes | Después |
+|---|---|---|
+| Archivos Parquet | 12.006 | 910 |
+| Bronze eventos | 72 MB | 12 MB |
+| Silver eventos | 62 MB | 3,3 MB |
+| Quarantine | 21 MB | 1,2 MB |
+
+**Evidencia:** [rutas_y_tamanios_ANTES.txt](evidence/rutas_y_tamanios_ANTES.txt) y [rutas_y_tamanios.txt](evidence/rutas_y_tamanios.txt).
