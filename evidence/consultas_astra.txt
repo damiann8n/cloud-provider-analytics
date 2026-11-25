@@ -1,0 +1,27 @@
+Consulta 1 - org_0lvsnujz del 2025-08-01 al 2025-08-07
+    usage_date    service daily_cost_usd requests
+0   2025-08-01  analytics        24.6844    363.0
+1   2025-08-01   database        13.6787    241.0
+2   2025-08-01    storage         8.4007    399.0
+3   2025-08-02  analytics        33.5652    374.0
+4   2025-08-02   database         0.8243     None
+5   2025-08-02    storage         2.2995    109.0
+6   2025-08-03  analytics         5.1203    124.0
+7   2025-08-03    storage         6.4308    355.0
+8   2025-08-04  analytics        30.2652    439.0
+9   2025-08-04   database         1.5956     None
+10  2025-08-04    storage         7.0998    153.0
+11  2025-08-05  analytics        13.1185    207.0
+12  2025-08-05   database         6.9888    115.0
+13  2025-08-05    storage          4.175    223.0
+14  2025-08-06  analytics        17.2325    242.0
+15  2025-08-06   database        12.1056    233.0
+16  2025-08-06    storage         7.6186    352.0
+17  2025-08-07  analytics        30.8738    392.0
+18  2025-08-07    storage         2.3952    109.0
+
+Consulta 2 - Top 3 servicios por costo en 14 dias - org_0lvsnujz
+   cost_14d    service
+0  406.2605  analytics
+1  148.3036   database
+2   61.1472    storage

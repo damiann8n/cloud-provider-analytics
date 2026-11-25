@@ -1,0 +1,24 @@
+3.0M	/content/datalake/_checkpoints/bronze_usage_events
+1.1M	/content/datalake/_checkpoints/silver_gold_usage_events
+52K	/content/datalake/bronze/billing_monthly
+20K	/content/datalake/bronze/customers_orgs
+36K	/content/datalake/bronze/marketing_touches
+16K	/content/datalake/bronze/nps_surveys
+24K	/content/datalake/bronze/resources
+32K	/content/datalake/bronze/support_tickets
+72M	/content/datalake/bronze/usage_events
+36K	/content/datalake/bronze/users
+1.8M	/content/datalake/gold/org_daily_usage_by_service
+20K	/content/datalake/gold/top_services_14d
+16K	/content/datalake/landing/billing_monthly.csv
+8.0K	/content/datalake/landing/customers_orgs.csv
+100K	/content/datalake/landing/marketing_touches.csv
+4.0K	/content/datalake/landing/nps_surveys.csv
+36K	/content/datalake/landing/resources.csv
+72K	/content/datalake/landing/support_tickets.csv
+13M	/content/datalake/landing/usage_events_stream
+72K	/content/datalake/landing/users.csv
+21M	/content/datalake/quarantine/usage_events
+62M	/content/datalake/silver/usage_events
+
+12006

@@ -1,0 +1,14 @@
+{
+  "landing": "/content/datalake/landing",
+  "bronze": "/content/datalake/bronze",
+  "silver": "/content/datalake/silver",
+  "gold": "/content/datalake/gold",
+  "quarantine": "/content/datalake/quarantine",
+  "checkpoints": "/content/datalake/_checkpoints",
+  "watermark": "60 days",
+  "max_files_per_trigger": 10,
+  "costo_minimo": -0.01,
+  "astra_keyspace": "default_keyspace",
+  "tabla_diaria": "org_daily_usage_by_service",
+  "tabla_top14": "top_services_14d"
+}

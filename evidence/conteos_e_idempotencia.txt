@@ -1,0 +1,17 @@
+Ejecucion: 2026-11-25 00:24:21.886151
+
+Batch CSV -> Bronze (leidas / en bronze)
+  customers_orgs           80     80
+  users                   800    800
+  resources               400    400
+  support_tickets        1000   1000
+  marketing_touches      1500   1500
+  nps_surveys              92     92
+  billing_monthly         240    240
+
+Idempotencia (antes / despues)
+  bronze               43200   43200
+  quarantine            2244    2244
+  silver               40956   40956
+  gold                 11050   11050
+  astra_org_ejemplo      156     156
